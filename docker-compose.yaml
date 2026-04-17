@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5434:5432"
+      - "5434:5432" # Mapping du port 5432 du conteneur vers le port 5434 de l'hôte
     volumes:
       - pgdata:/var/lib/postgresql # Chemin vers le volume pgdata dans lequel vont être persisté nos données
     
