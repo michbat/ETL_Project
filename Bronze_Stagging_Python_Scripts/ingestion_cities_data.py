@@ -41,13 +41,52 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 def coerce_types(df: pd.DataFrame) -> pd.DataFrame:
     # Minimal coercions for common uscities columns (best-effort)
-    mapping = {
-        "population": "Int64",
-        "density": "float64",
+    new_data_type = {
+        "city": "string",
+        "city_ascii": "string",
+        "city_alt": "string",
+        "state_id": "string",
+        "state_name": "string",
+        "county_fips": "int64",
+        "county_name": "string",
+        "county_fips_all": "string",
+        "county_name_all": "string",
         "lat": "float64",
         "lng": "float64",
+        "population": "int64",
+        "population_proper": "int64",
+        "density": "int64",
+        "source": "string",
+        "military": "bool",
+        "incorporated": "bool",
+        "cdp": "bool",
+        "timezone": "string",
+        "ranking": "int64",
+        "zips": "string",
+        "id": "int64",
+        "age_median": "float64",
+        "male": "float64",
+        "female": "float64",
+        "married": "float64",
+        "family_size": "float64",
+        "income_household_median": "float64",
+        "income_household_six_figure": "float64",
+        "home_ownership": "float64",
+        "home_value": "float64",
+        "rent_median": "float64",
+        "education_college_or_above": "float64",
+        "labor_force_participation": "float64",
+        "unemployment_rate": "float64",
+        "race_white": "float64",
+        "race_black": "float64",
+        "race_asian": "float64",
+        "race_native": "float64",
+        "race_pacific": "float64",
+        "race_other": "float64",
+        "race_multiple": "float64",
     }
-    for col, tp in mapping.items():
+    
+    for col, tp in new_data_type.items():
         if col in df.columns:
             try:
                 df[col] = df[col].astype(tp)  # type: ignore
@@ -79,7 +118,7 @@ def add_ingestion_metadata(df: pd.DataFrame, source_path: str) -> pd.DataFrame:
 @click.option("--pg-port", default=5434, help="Postgres port", type=int)
 @click.option("--pg-db", default="us_violent_incidents", help="Postgres database")
 @click.option("--schema", default="bronze", help="Schema cible (ex: bronze)")
-@click.option("--source", default="datasets/uscities.csv", help="Chemin vers le fichier source CSV")
+@click.option("--source", default="../datasets/uscities.csv", help="Chemin vers le fichier source CSV")
 @click.option("--table", default="cities", help="Nom de la table cible (sans schema) ou schema.table)")
 @click.option("--chunksize", default=50000, type=int, help="Taille des chunks (nombre de lignes par batch)")
 @click.option("--if-exists", default="replace", type=click.Choice(["replace", "append"]), help="Comportement si la table existe")

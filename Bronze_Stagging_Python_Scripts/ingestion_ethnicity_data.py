@@ -84,7 +84,7 @@ def add_ingestion_metadata(df: pd.DataFrame, source_path: str) -> pd.DataFrame:
 @click.option("--pg-port", default=5434, help="Postgres port", type=int)
 @click.option("--pg-db", default="us_violent_incidents", help="Postgres database")
 @click.option("--schema", default="bronze", help="Schema cible (ex: bronze)")
-@click.option("--source", default="../Didier/datasets/Ethnicity_Data_Usa.xlsx", help="Chemin vers le fichier source")
+@click.option("--source", default="../datasets/Ethnicity_Data_Usa.xlsx", help="Chemin vers le fichier source")
 @click.option("--table", default="ethnicity", help="Nom de la table cible (sans schema) ou schema.table)")
 @click.option("--if-exists", default="replace", type=click.Choice(["replace", "append"]), help="Comportement si la table existe")
 

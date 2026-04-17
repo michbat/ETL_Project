@@ -11,6 +11,24 @@ services:
       - "5434:5432" # Mapping du port 5432 du conteneur vers le port 5434 de l'hôte
     volumes:
       - pgdata:/var/lib/postgresql # Chemin vers le volume pgdata dans lequel vont être persisté nos données
-    
+    networks:
+      - pg-network
+  ingest:  # Service d'ingestion
+    image: ingest:v001
+    restart: "no"
+    depends_on:
+      - postgres-db
+    env_file: # Utilisation d'un fichier d'environnement pour les variables sensibles
+      - ingest.env
+    volumes:
+      - ./datasets:/datasets:ro # Monte le répertoire local datasets en lecture seule
+    networks:
+      - pg-network
+      
+networks:
+  pg-network:
+    name: pg-network # force le nom exact (éviter les préfixe auto)
+    driver: bridge
+   
 volumes:
   pgdata: {}
