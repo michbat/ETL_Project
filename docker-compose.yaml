@@ -1,0 +1,16 @@
+services:
+  postgres-db: 
+    image: postgres:latest  # Utilise la dernière version de PostgreSQL
+    container_name: us_violent_incidents # Nom du conteneur
+    restart: always # Redémarre le conteneur automatiquement en cas de plantage
+    environment:  # Variables d'environnement pour la configuration de PostgreSQL
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql # Chemin vers le volume pgdata dans lequel vont être persisté nos données
+    
+volumes:
+  pgdata: {}
