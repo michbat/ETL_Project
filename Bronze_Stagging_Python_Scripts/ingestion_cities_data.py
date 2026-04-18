@@ -2,19 +2,13 @@
 # coding: utf-8
 
 """
-Ingester pour uscities.csv -> PostgreSQL (chunked)
+Ingestion pour uscities.csv -> PostgreSQL (chunked)
 
-Usage:
-    python ingestion_cities_data.py --pg-user admin --pg-pass admin \
-        --pg-host localhost --pg-port 5434 --pg-db us_violent_incidents \
-        --source datasets/uscities.csv --schema bronze --table cities
 
-Le script lit le CSV par chunks, normalise les colonnes, force quelques types,
+Le script lit le CSV par morceaux, normalise les colonnes, force les types de données pour éviter le plantage lors de l'ingestion,
 ajoute les colonnes d'ingestion (`source_filename`, `batch_id`, `load_datetime`)
 et écrit les données vers PostgreSQL en créant la table si nécessaire.
 """
-
-from __future__ import annotations
 
 import os
 import uuid
@@ -25,9 +19,10 @@ from sqlalchemy import create_engine, text
 from sqlalchemy import types as sqltypes
 from tqdm.auto import tqdm
 
+# Query string de connexion (format SQLAlchemy)
 URL: str = "postgresql+psycopg://{user}:{pw}@{host}:{port}/{db}"
 
-
+# Fonction pour normaliser les noms de colonnes (enlever les espaces, mettre en minuscules, etc.)
 def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df.columns = (
@@ -38,9 +33,9 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
     )
     return df
 
-
+# Fonction pour forcer les types de données des colonnes pour éviter les erreurs d'ingestion
 def coerce_types(df: pd.DataFrame) -> pd.DataFrame:
-    # Minimal coercions for common uscities columns (best-effort)
+    # Dictionnaire de types de données souhaités pour les colonnes  (type de données SQLAlchemy)
     new_data_type = {
         "city": "string",
         "city_ascii": "string",
@@ -85,7 +80,7 @@ def coerce_types(df: pd.DataFrame) -> pd.DataFrame:
         "race_other": "float64",
         "race_multiple": "float64",
     }
-    
+     # Forcer les types de données pour les colonnes présentes dans le DataFrame en itérant sur le dictionnaire et en transformant les types des  colonnes 
     for col, tp in new_data_type.items():
         if col in df.columns:
             try:
@@ -98,6 +93,7 @@ def coerce_types(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+# Fonction pour ajouter les colonnes supplémentaires (source_filename, batch_id, load_datetime)
 def add_ingestion_metadata(df: pd.DataFrame, source_path: str) -> pd.DataFrame:
     source_file = os.path.basename(source_path)
     batch_id = str(uuid.uuid4())
@@ -106,11 +102,13 @@ def add_ingestion_metadata(df: pd.DataFrame, source_path: str) -> pd.DataFrame:
     df["source_filename"] = source_file
     df["batch_id"] = batch_id
     df["load_datetime"] = load_dt
-
-    df = df.astype({"source_filename": "string", "batch_id": "string"})
+    
+    # Coercion des types pour les colonnes d'ingestion
+    df = df.astype({"source_filename": "string", "batch_id": "string", "load_datetime": "datetime64[ns]"})
     return df
 
 
+# CLI avec Click pour utiliser des arguments optionnels flexibles lors de l'exécution du script en ligne de commande
 @click.command()
 @click.option("--pg-user", default="admin", help="Postgres user")
 @click.option("--pg-pass", default="admin", help="Postgres password")
@@ -122,50 +120,54 @@ def add_ingestion_metadata(df: pd.DataFrame, source_path: str) -> pd.DataFrame:
 @click.option("--table", default="cities", help="Nom de la table cible (sans schema) ou schema.table)")
 @click.option("--chunksize", default=50000, type=int, help="Taille des chunks (nombre de lignes par batch)")
 @click.option("--if-exists", default="replace", type=click.Choice(["replace", "append"]), help="Comportement si la table existe")
+
+# Main function pour l'ingestion
 def main(pg_user: str, pg_pass: str, pg_host: str, pg_port: int, pg_db: str, schema: str, source: str, table: str, chunksize: int, if_exists: str) -> None:
     """Ingère le CSV des villes en mode chunked.
     """
     engine = create_engine(URL.format(user=pg_user, pw=pg_pass, host=pg_host, port=pg_port, db=pg_db))
 
-    # Determine schema and table name: allow --table as 'schema.table' or plain table name with --schema
+    # Spliter le nom de la table si jamais précisé (ex: "bronze.cities" -> schema="bronze", table_only="cities")
     if "." in table:
         schema, table_only = table.split(".", 1)
     else:
         table_only = table
 
-    # dtype mapping is best-effort; avoid strict typing for unknown columns
-    # ingestion columns SQL types
+    # Définition des types de données pour les colonnes ajoutées lors de l'ingestion (pour la création de table)
     ingestion_dtype = {
         "source_filename": sqltypes.VARCHAR(length=255),
         "batch_id": sqltypes.VARCHAR(length=255),
         "load_datetime": sqltypes.TIMESTAMP(),
     }
 
-    # Read CSV iterator
+    # Affichage du message de démarrage avec la source de données et la taille des chunks
     print(f"Lecture par chunks depuis: {source} (chunksize={chunksize})")
+    
+    # Création d'un itérateur de DataFrames à partir du CSV
     df_iter = pd.read_csv(source, iterator=True, chunksize=chunksize, low_memory=False)
 
-    # Ensure schema exists
+    # S'assurer que le schema existe avant d'ingérer les données
     with engine.begin() as conn:
         conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {schema}"))
 
-    first = True
-    total = 0
+    first:bool = True # variable drapeau pour créer la table vie avant d'insérer les données
+    total : int = 0 # variable pour compter le nombre total de lignes ingérées
+    
+    # Itération sur l'itérateur de DataFrames pour traiter et ingérer les données par chunks
     for df_chunk in tqdm(df_iter, desc="ingesting"):
         # normalize & coerce
-        df_chunk = normalize_columns(df_chunk)
-        df_chunk = coerce_types(df_chunk)
-
-        # add ingestion metadata per chunk
-        df_chunk = add_ingestion_metadata(df_chunk, source)
+        df_chunk = normalize_columns(df_chunk)  # enlèver les espaces, mettre en minuscules, etc.
+        df_chunk = coerce_types(df_chunk)  # forcer les types des colonnes pour éviter les erreurs d'ingestion
+        df_chunk = add_ingestion_metadata(df_chunk, source)  # ajout de colonnes supplémnetaires d'ingestion (source_filename, batch_id, load_datetime)
 
         if first:
-            # create table structure from the DataFrame that includes ingestion columns
+            # Création de la structure de la table lors de la première itération avec remplacement de la table si elle existe déjà (option `if_exists="replace"`)
             df_chunk.head(0).to_sql(name=table_only, schema=schema, con=engine, if_exists="replace", index=False, dtype=ingestion_dtype)  # type: ignore
-            first = False
-
+            first = False # on désactive le drapeau après la première itération pour les suivantes
+            
+        # Après la 1ère itération, on ajoute les données avec `if_exists="append"` pour ne pas écraser la table déjà créée
         df_chunk.to_sql(name=table_only, schema=schema, con=engine, if_exists="append", index=False)
-        total += len(df_chunk)
+        total += len(df_chunk) # on ajoute le nombre de lignes du chunk au total pour le message final
 
     print(f"Ingestion terminée: {total} lignes insérées dans {schema}.{table_only}.")
 

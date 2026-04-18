@@ -21,7 +21,7 @@ services:
     env_file: # Utilisation d'un fichier d'environnement pour les variables sensibles
       - ingest.env
     volumes:
-      - ./datasets:/datasets:ro # Monte le répertoire local datasets en lecture seule
+      - ./datasets:/datasets:ro # Monte le répertoire local datasets en lecture seule (ro : read only)
     networks:
       - pg-network
       

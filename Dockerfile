@@ -18,7 +18,6 @@ RUN apt-get update \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Créer un environnement virtuel dans l'image en utilisant uv et le lockfile
-# (ne pas copier .venv depuis l'hôte: souvent incompatible)
 RUN uv sync --locked
 
 # Copier les scripts d'ingestion
@@ -26,8 +25,7 @@ COPY ./Bronze_Stagging_Python_Scripts/ingestion_cities_data.py ./
 COPY ./Bronze_Stagging_Python_Scripts/ingestion_ethnicity_data.py ./
 COPY ./Bronze_Stagging_Python_Scripts/ingestion_shootings_data.py ./
 
-# Ne pas copier les données dans l'image — on montera le dossier `datasets` au runtime
-# (évite d'embarquer des données volumineuses et permet de mettre à jour les sources sans rebuild)
+# Ne pas copier les données dans l'image — monter `datasets` au runtime
 
 # Copier le runner shell et le rendre exécutable
 COPY run_all.sh /app/run_all.sh
