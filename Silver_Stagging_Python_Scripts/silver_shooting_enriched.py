@@ -23,7 +23,7 @@ def get_engine() -> Engine:
 def load_data(engine: Engine) -> Dict[str, pd.DataFrame]:
     """ Charge les tables depuis la base de données et retourne un dictionnaire de DataFrames. """
     df_shootings = pd.read_sql_query(text('SELECT * FROM silver.shootings_clean'), con=engine)
-    df_cities = pd.read_sql_query(text('SELECT * FROM silver.cities_clean'), con=engine)
+    df_cities = pd.read_sql_query(text('SELECT * FROM silver.uscities_clean'), con=engine)
     df_ethnicity = pd.read_sql_query(text('SELECT * FROM silver.ethnicity_clean'), con=engine)
     return {'shootings': df_shootings, 'cities': df_cities, 'ethnicity': df_ethnicity}
 
@@ -105,13 +105,13 @@ def get_dtype_dict() -> Dict:
         'race_label': String(50),
         'city': String(100),
         'state_code': String(5),
-        'signs_of_mental_illness': Boolean(),
+        'signs_of_mental_illness': SmallInteger(),
         'threat_level': String(50),
         'flee': String(50),
-        'body_camera': Boolean(),
+        'body_camera': SmallInteger(),
         'incident_longitude': Float(),
         'incident_latitude': Float(),
-        'is_geocoding_exact': Boolean(),
+        'is_geocoding_exact': SmallInteger(),
         'id_city': Integer(),
         'state_name': String(50),
         'county_name': String(100),
@@ -136,11 +136,11 @@ def get_dtype_dict() -> Dict:
         'month': SmallInteger(),
         'quarter': SmallInteger(),
         'weekday': SmallInteger(),
-        'is_weekend': Boolean(),
+        'is_weekend': SmallInteger(),
         'age_band': String(10),
-        'flee_flag': Boolean(),
-        'armed_flag': Boolean(),
-        'unarmed_flag': Boolean(),
+        'flee_flag': SmallInteger(),
+        'armed_flag': SmallInteger(),
+        'unarmed_flag': SmallInteger(),
         'weapon_category': String(50)
     }
 

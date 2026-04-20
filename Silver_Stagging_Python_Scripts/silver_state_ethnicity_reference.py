@@ -1,5 +1,4 @@
 import pandas as pd
-import time
 import os
 from tqdm import tqdm
 from sqlalchemy import create_engine, text
@@ -9,7 +8,7 @@ from typing import Dict
 
 def get_engine() -> Engine:
     """ Crée et retourne une connexion à la base de données PostgreSQL."""
-    # query_string = 'postgresql+psycopg://admin:admin@localhost:5434/us_violent_incidents'
+    query_string = 'postgresql+psycopg://admin:admin@localhost:5434/us_violent_incidents'
     host = os.environ.get('POSTGRES_HOST', 'postgres-db')
     port = os.environ.get('POSTGRES_PORT', '5432')
     user = os.environ['POSTGRES_USER']
@@ -20,8 +19,8 @@ def get_engine() -> Engine:
     return create_engine(query_string)
 
 def load_data(engine: Engine) -> pd.DataFrame:
-    """ Charge les données de la table bronze.ethnicity dans un DataFrame pandas."""
-    df = pd.read_sql_table('ethnicity', con=engine, schema='bronze')
+    """ Charge les données de la table bronze.ethnicity_raw dans un DataFrame pandas."""
+    df = pd.read_sql_table('ethnicity_raw', con=engine, schema='bronze')
     return df
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:

@@ -23,8 +23,8 @@ def get_engine() -> Engine:
 
 
 def load_data(engine: Engine) -> pd.DataFrame:
-    """ Charge les données de la table bronze.cities dans un DataFrame pandas."""
-    df = pd.read_sql_table('cities', con=engine, schema='bronze')
+    """ Charge les données de la table bronze.uscities_raw dans un DataFrame pandas."""
+    df = pd.read_sql_table('uscities_raw', con=engine, schema='bronze')
     return df
 
 
@@ -86,13 +86,13 @@ def save_to_db(df: pd.DataFrame, engine: Engine, dtype_dict: Dict) -> None:
         conn.execute(text("CREATE SCHEMA IF NOT EXISTS silver"))
         
     # Enregistrer les données dans la table silver.cities_clean en utilisant des chunks pour gérer les grandes quantités de données et éviter les problèmes de mémoire
-    chunk_size = 2000
+    chunk_size = 5000
     rows = 0
     start_time = time.time()
     for start in tqdm(range(0, len(df), chunk_size)):
         end = start + chunk_size
         df.iloc[start:end].to_sql(
-            'cities_clean',
+            'uscities_clean',
             con=engine,
             schema='silver',
             if_exists='append' if start > 0 else 'replace',
@@ -104,12 +104,12 @@ def save_to_db(df: pd.DataFrame, engine: Engine, dtype_dict: Dict) -> None:
     elapsed_time = time.time() - start_time
     print(f"Toutes les données ont été écrites en {elapsed_time:.2f} secondes. {rows} lignes insérées.")
     
-    # Ajouter une clé primaire à la table silver.cities_clean sur la colonne id_city
+    # Ajouter une clé primaire à la table silver.uscities_clean sur la colonne id_city
     with engine.begin() as conn:
         conn.execute(text("""
-            ALTER TABLE silver.cities_clean
-            DROP CONSTRAINT IF EXISTS cities_clean_pkey;
-            ALTER TABLE silver.cities_clean
+            ALTER TABLE silver.uscities_clean
+            DROP CONSTRAINT IF EXISTS uscities_clean_pkey;
+            ALTER TABLE silver.uscities_clean
             ADD PRIMARY KEY (id_city);
         """))
 

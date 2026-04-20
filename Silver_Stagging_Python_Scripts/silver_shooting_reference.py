@@ -21,8 +21,8 @@ def get_engine() -> Engine:
     return create_engine(query_string)
 
 def load_data(engine: Engine) -> pd.DataFrame:
-    """ Charge les données de la table bronze.shootings dans un DataFrame pandas."""
-    df = pd.read_sql_table('shootings', con=engine, schema='bronze')
+    """ Charge les données de la table bronze.shootings_raw dans un DataFrame pandas."""
+    df = pd.read_sql_table('shootings_raw', con=engine, schema='bronze')
     return df
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -131,7 +131,7 @@ def save_to_db(df: pd.DataFrame, engine: Engine, dtype_dict: Dict) -> None:
         conn.execute(text("CREATE SCHEMA IF NOT EXISTS silver"))
         
     # Enregistrer les données dans la table silver.shootings_clean en utilisant des chunks pour gérer les grandes quantités de données
-    chunk_size = 500
+    chunk_size = 1000
     rows = 0
     start_time = time.time()
     
