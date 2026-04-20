@@ -6,10 +6,10 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Ajouter l'environnement virtuel au PATH pour utiliser les packages installés
+# Ajouter l'environnement virtuel au PATH du container pour utiliser les packages installés
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Copier d'abord les fichiers de dépendances (optimisation du cache Docker)
+# Copier les fichiers de dépendances (optimisation du cache Docker)
 COPY pyproject.toml uv.lock .python-version ./
 
 # Installer les dépendances système nécessaires (libpq pour psycopg, outils de build)
@@ -20,12 +20,8 @@ RUN apt-get update \
 # Créer un environnement virtuel dans l'image en utilisant uv et le lockfile
 RUN uv sync --locked
 
-# Copier les scripts d'ingestion
-COPY ./Bronze_Stagging_Python_Scripts/ingestion_cities_data.py ./
-COPY ./Bronze_Stagging_Python_Scripts/ingestion_ethnicity_data.py ./
-COPY ./Bronze_Stagging_Python_Scripts/ingestion_shootings_data.py ./
-
-# Ne pas copier les données dans l'image — monter `datasets` au runtime
+# Copier les scripts python d'ingestion dans le dossier
+COPY ./Bronze_Stagging_Python_Scripts/*.py ./
 
 # Copier le runner shell et le rendre exécutable
 COPY run_bronze.sh /app/run_bronze.sh
