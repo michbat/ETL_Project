@@ -24,6 +24,15 @@ services:
       - ./datasets:/datasets:ro # Monte le répertoire local datasets en lecture seule (ro : read only)
     networks:
       - pg-network
+  transform:  # Service de transformation
+    image: transform:v001
+    restart: "no"
+    depends_on:
+      - postgres-db
+    env_file: # Utilisation d'un fichier d'environnement pour les variables sensibles
+      - ingest.env
+    networks:
+      - pg-network
       
 networks:
   pg-network:

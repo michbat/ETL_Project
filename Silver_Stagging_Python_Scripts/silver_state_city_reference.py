@@ -1,5 +1,6 @@
 import pandas as pd
 import time
+import os
 from tqdm import tqdm
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine.base import Engine
@@ -9,7 +10,15 @@ from typing import Dict
 
 def get_engine() -> Engine:
     """ Crée et retourne une instance de SQLAlchemy Engine pour se connecter à la base de données PostgreSQL."""
-    query_string = 'postgresql+psycopg://admin:admin@localhost:5434/us_violent_incidents'
+    # query_string = 'postgresql+psycopg://admin:admin@localhost:5434/us_violent_incidents'
+    
+    host = os.environ.get('POSTGRES_HOST', 'postgres-db')
+    port = os.environ.get('POSTGRES_PORT', '5432')
+    user = os.environ['POSTGRES_USER']
+    password = os.environ['POSTGRES_PASSWORD']
+    db = os.environ['POSTGRES_DB']
+
+    query_string = f'postgresql+psycopg://{user}:{password}@{host}:{port}/{db}'
     return create_engine(query_string)
 
 
