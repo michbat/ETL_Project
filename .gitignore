@@ -9,6 +9,7 @@ wheels/
 # Virtual environments
 .venv
 ingest.env
+.env
 
 # .txt files
 *.txt
