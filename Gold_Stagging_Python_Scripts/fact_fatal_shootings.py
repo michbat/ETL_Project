@@ -153,7 +153,7 @@ def add_primary_key(engine: Engine) -> None:
         """))
 
 def main() -> None:
-    """Pipeline principal pour construire et sauvegarder la table de faits fact_fatal_shootings."""
+    """Fonction main pour construire et sauvegarder la table de faits fact_fatal_shootings."""
     engine = get_engine()
     create_gold_schema(engine)
     df_staging = load_staging(engine)
