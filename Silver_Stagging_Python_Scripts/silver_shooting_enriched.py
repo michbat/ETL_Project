@@ -77,10 +77,19 @@ def enrich_data(dfs: Dict[str, pd.DataFrame]) -> pd.DataFrame:
     
     # Traiter les cas où l'âge est 0 en les assignant à la bande '0-17'
     df.loc[df['age'] == 0, 'age_band'] = '0-17'
-    
-    # Renommer la colonne 'race' en 'race_label' pour plus de clarté
-    df = df.rename(columns={'race': 'race_label', 'total_population': 'total_population_state', 'body_camera': 'body_camera_flag'})
-    
+        
+    # Renommage de certaines colonnes certaines colonnes 
+    df = df.rename(columns={
+        'race': 'race_label',
+        'total_population': 'total_population_state',
+        'body_camera': 'body_camera_flag',
+        'white': 'white_population',
+        'black': 'black_population',
+        'hispanic': 'hispanic_population',
+        'asian': 'asian_population',
+        'american_indian': 'american_indian_population'
+    })
+        
     # Ajouter des indicateurs binaires pour les colonnes 'flee' et 'armed'
     df['flee_flag'] = df['flee'].apply(lambda x: 0 if x == 'not fleeing' else 1)
     df['armed_flag'] = df['armed'].apply(lambda x: 0 if x == 'unarmed' else 1)

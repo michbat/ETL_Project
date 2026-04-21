@@ -21,6 +21,8 @@ python dim_location.py
 python dim_victim.py
 python dim_weapon.py
 python dim_circumstance.py
+python dim_state.py
+python dim_month.py
 python fact_fatal_shootings.py
 
 echo "Tous les scripts de transformation Gold ont été exécutés avec succès!"
