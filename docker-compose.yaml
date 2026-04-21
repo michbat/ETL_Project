@@ -33,6 +33,15 @@ services:
       - ingest.env
     networks:
       - pg-network
+  gold:  # Service de chargement dans la base de données
+    image: gold:v001
+    restart: "no"
+    depends_on:
+      - postgres-db
+    env_file: # Utilisation d'un fichier d'environnement pour les variables sensibles
+      - ingest.env  
+    networks:
+      - pg-network
       
 networks:
   pg-network:

@@ -4,7 +4,7 @@ import os
 from tqdm import tqdm
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine.base import Engine
-from sqlalchemy.types import Integer, String, Float, Date, SmallInteger, Boolean
+from sqlalchemy.types import Integer, String, Float, Date, SmallInteger, DateTime
 from typing import Dict
 
 def get_engine() -> Engine:
@@ -79,7 +79,7 @@ def enrich_data(dfs: Dict[str, pd.DataFrame]) -> pd.DataFrame:
     df.loc[df['age'] == 0, 'age_band'] = '0-17'
     
     # Renommer la colonne 'race' en 'race_label' pour plus de clarté
-    df = df.rename(columns={'race': 'race_label'})
+    df = df.rename(columns={'race': 'race_label', 'total_population': 'total_population_state', 'body_camera': 'body_camera_flag'})
     
     # Ajouter des indicateurs binaires pour les colonnes 'flee' et 'armed'
     df['flee_flag'] = df['flee'].apply(lambda x: 0 if x == 'not fleeing' else 1)
@@ -89,6 +89,20 @@ def enrich_data(dfs: Dict[str, pd.DataFrame]) -> pd.DataFrame:
     # Catégoriser les armes en utilisant la fonction categorize_weapon
     df['weapon_category'] = df['armed'].apply(categorize_weapon)
     
+    # Ajouter une colonne 'race_code' en utilisant un mapping des labels de race
+    race_code_mapping = {
+        'white': 'W',
+        'black': 'B',
+        'hispanic': 'H',
+        'asian': 'A',
+        'native american': 'N',
+        'other': 'O',
+        'unknown': 'U'
+    }
+
+    # Appliquer le mapping des codes de race
+    df['race_code'] = df['race_label'].map(race_code_mapping)
+        
     # Retourner le DataFrame enrichi
     return df
 
@@ -97,7 +111,7 @@ def get_dtype_dict() -> Dict:
     return {
         'id_shooting': Integer(),
         'name': String(255),
-        'date': Date(),
+        'date': DateTime(),
         'manner_of_death': String(50),
         'armed': String(100),
         'age': SmallInteger(),
@@ -121,7 +135,7 @@ def get_dtype_dict() -> Dict:
         'density': Float(),
         'timezone': String(50),
         'id_ethnicity': Integer(),
-        'total_population': Integer(),
+        'total_population_state': Integer(),
         'white': Integer(),
         'black': Integer(),
         'hispanic': Integer(),

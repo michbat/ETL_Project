@@ -155,11 +155,9 @@ def save_to_db(df: pd.DataFrame, engine: Engine, dtype_dict: Dict) -> None:
     with engine.begin() as conn:
         conn.execute(text("""
             ALTER TABLE silver.shootings_clean
-            DROP CONSTRAINT IF EXISTS shootings_clean_pkey;
-            ALTER TABLE silver.shootings_clean
-            ADD PRIMARY KEY (id_shooting);
+            ADD CONSTRAINT pk_shootings_clean PRIMARY KEY (id_shooting);
         """))
-
+  
 def main() -> None:
     """ fonction main pour exécuter le processus de chargement, nettoyage, enrichissement et sauvegarde des données de shootings."""
     engine = get_engine()

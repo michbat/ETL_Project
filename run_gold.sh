@@ -16,9 +16,11 @@ export POSTGRES_HOST POSTGRES_PORT POSTGRES_USER POSTGRES_PASSWORD POSTGRES_DB
 
 echo "Début de la transformation avec host=${POSTGRES_HOST} port=${POSTGRES_PORT} db=${POSTGRES_DB}"
 
-python silver_state_city_reference.py
-python silver_state_ethnicity_reference.py
-python silver_shooting_reference.py
-python silver_shooting_enriched.py
+python dim_date.py
+python dim_location.py
+python dim_victim.py
+python dim_weapon.py
+python dim_circumstance.py
+python fact_fatal_shootings.py
 
-echo "Tous les scripts de transformation Silver ont été exécutés avec succès!"
+echo "Tous les scripts de transformation Gold ont été exécutés avec succès!"

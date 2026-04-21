@@ -11,7 +11,7 @@ POSTGRES_DB="${POSTGRES_DB:-}"
 
 # Vérifier que les variables d'environnement nécessaires sont définies
 if [ -z "${POSTGRES_USER}" ] || [ -z "${POSTGRES_PASSWORD}" ] || [ -z "${POSTGRES_DB}" ]; then
-	echo "ERROR: environment variables POSTGRES_USER, POSTGRES_PASSWORD and POSTGRES_DB must be set" >&2
+	echo "ERREUR: les variables d'environnement POSTGRES_USER, POSTGRES_PASSWORD et POSTGRES_DB doivent être définies" >&2
 	exit 1
 fi
 

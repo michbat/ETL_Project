@@ -106,6 +106,13 @@ def save_to_db(df: pd.DataFrame, engine: Engine, dtype_dict: Dict) -> None:
     # Enregistrer les données dans la table silver.ethnicity_clean
     df.to_sql('ethnicity_clean', con=engine, schema='silver', if_exists='replace', index=False, dtype=dtype_dict)
     print(f"Toutes les données ont été écrites dans la base de données. Total de lignes insérées: {len(df)}")
+    
+    # Ajouter une clé primaire à la table
+    with engine.begin() as conn:
+        conn.execute(text("""
+            ALTER TABLE silver.ethnicity_clean
+            ADD CONSTRAINT pk_ethnicity_clean PRIMARY KEY (id_ethnicity);
+        """))
 
 def main() -> None:
     """ Fonction main qui orchestre le processus de chargement, nettoyage et enregistrement des données d'ethnie."""

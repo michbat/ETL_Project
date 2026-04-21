@@ -108,11 +108,8 @@ def save_to_db(df: pd.DataFrame, engine: Engine, dtype_dict: Dict) -> None:
     with engine.begin() as conn:
         conn.execute(text("""
             ALTER TABLE silver.uscities_clean
-            DROP CONSTRAINT IF EXISTS uscities_clean_pkey;
-            ALTER TABLE silver.uscities_clean
-            ADD PRIMARY KEY (id_city);
+            ADD CONSTRAINT pk_uscities_clean PRIMARY KEY (id_city);
         """))
-
 
 def main() -> None:
     """ Fonction main qui exécute les étapes de chargement, nettoyage et enregistrement des données des villes."""

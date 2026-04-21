@@ -1,0 +1,32 @@
+FROM python:3.11-slim
+
+# Copier le binaire uv depuis l'image officielle (multi-stage build)
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Ajouter l'environnement virtuel au PATH pour utiliser les packages installés
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Copier d'abord les fichiers de dépendances (optimisation du cache Docker)
+COPY pyproject.toml uv.lock .python-version ./
+
+# Installer les dépendances système nécessaires (libpq pour psycopg, outils de build)
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends libpq-dev libpq5 build-essential gcc ca-certificates \
+	&& rm -rf /var/lib/apt/lists/*
+
+# Créer un environnement virtuel dans l'image en utilisant uv et le lockfile
+RUN uv sync --locked
+
+# Copier les scripts de transformation
+COPY Gold_Stagging_Python_Scripts/*.py ./
+
+# Script d'orchestration, à adapter selon l'ordre d'exécution souhaité
+# Copier le runner shell et le rendre exécutable
+COPY run_gold.sh /app/run_gold.sh
+RUN chmod +x /app/run_gold.sh
+
+# Point d'entrée: lancer le runner shell qui exécute les 4 scripts
+ENTRYPOINT ["./run_gold.sh"]
