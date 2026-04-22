@@ -86,7 +86,7 @@ def main(pg_user: str, pg_pass: str, pg_host: str, pg_port: int, pg_db: str, sch
     # Création de la structure de la table lors de la première itération avec remplacement de la # table si elle existe déjà (option `if_exists="replace"`)
     df2.head(0).to_sql(name=table_only, schema=schema, con=engine, if_exists="replace", index=False) # type: ignore
 
-    # Ensuite, on insère les données avec l'option `if_exists="append"` pour ajouter les données # à la table créée précédemment
+    # Ensuite, on insère les données avec l'option `if_exists="append"` pour ajouter les données à la table créée précédemment
     df2.to_sql(name=table_only, schema=schema, con=engine, if_exists="append", index=False)
 
     print(f"Ingestion terminée: {len(df2)} lignes insérées dans {schema}.{table_only}.")

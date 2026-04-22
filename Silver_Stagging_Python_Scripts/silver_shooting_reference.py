@@ -76,7 +76,7 @@ def fill_coordinates(df: pd.DataFrame) -> pd.DataFrame:
     df['city_key'] = df['city'].astype(str).str.strip().str.lower() + '|' + df['state_code'].astype(str).str.strip().str.lower()
     
     # city_coords est un DataFrame qui contient les coordonnées (latitude et longitude) pour chaque clé de ville unique dans le DataFrame des shootings
-    # dropna est utilisé pour s'assurer que nous ne prenons en compte que les villes qui ont des coordonnées valides
+    # dropna est utilisé pour s'assurer de prendre en compte que les villes qui ont des coordonnées valides
     # first() est utilisé pour prendre la première occurrence de chaque clé de ville, ce qui est suffisant pour remplir les coordonnées des shootings. eVITER des doublons dans city_coords
     
     city_coords = df.dropna(subset=['latitude','longitude']).groupby('city_key')[['latitude','longitude']].first()
@@ -131,9 +131,9 @@ def save_to_db(df: pd.DataFrame, engine: Engine, dtype_dict: Dict) -> None:
         conn.execute(text("CREATE SCHEMA IF NOT EXISTS silver"))
         
     # Enregistrer les données dans la table silver.shootings_clean en utilisant des chunks pour gérer les grandes quantités de données
-    chunk_size = 1000
-    rows = 0
-    start_time = time.time()
+    chunk_size: int = 1000
+    rows: int = 0
+    start_time: float = time.time()
     
     # Utiliser tqdm pour afficher une barre de progression pendant l'insertion des données
     for start in tqdm(range(0, len(df), chunk_size)):
@@ -148,7 +148,7 @@ def save_to_db(df: pd.DataFrame, engine: Engine, dtype_dict: Dict) -> None:
             dtype=dtype_dict
         )
         rows += len(df.iloc[start:end])
-    elapsed_time = time.time() - start_time
+    elapsed_time: float = time.time() - start_time
     print(f"Toutes les données ont été écrites en {elapsed_time:.2f} secondes. {rows} lignes insérées.")
     
     # Ajouter une clé primaire à la table silver.shootings_clean sur la colonne id_shooting

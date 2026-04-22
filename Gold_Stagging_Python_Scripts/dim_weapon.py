@@ -71,9 +71,9 @@ def save_to_db(df: pd.DataFrame, engine: Engine, dtype_dict: Dict) -> None:
         conn.execute(text("CREATE SCHEMA IF NOT EXISTS gold"))
         
     # Insérer les données dans la table 'gold.dim_weapon' en utilisant les chunks
-    chunk_size = 500
-    rows = 0
-    start_time = time.time()
+    chunk_size:int = 500
+    rows:int = 0
+    start_time: float = time.time()
     for start in tqdm(range(0, len(df), chunk_size)):
         end = start + chunk_size
         df.iloc[start:end].to_sql(
@@ -88,7 +88,7 @@ def save_to_db(df: pd.DataFrame, engine: Engine, dtype_dict: Dict) -> None:
         )
         rows += len(df.iloc[start:end])
         
-    elapsed_time = time.time() - start_time
+    elapsed_time: float = time.time() - start_time
     print(f"Toutes les données ont été écrites en {elapsed_time:.2f} secondes. {rows} lignes insérées.")
     
     # Ajouter la contrainte de clé primaire sur weapon_key après l'insertion des données

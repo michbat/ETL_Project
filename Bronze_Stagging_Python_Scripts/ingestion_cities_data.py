@@ -82,7 +82,7 @@ def main(pg_user: str, pg_pass: str, pg_host: str, pg_port: int, pg_db: str, sch
         conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {schema}"))
 
     first:bool = True # variable drapeau pour créer la table vie avant d'insérer les données
-    total : int = 0 # variable pour compter le nombre total de lignes ingérées
+    total:int = 0 # variable pour compter le nombre total de lignes ingérées
     
     # Itération sur l'itérateur de DataFrames pour traiter et ingérer les données par chunks
     for df_chunk in tqdm(df_iter, desc="ingesting"):

@@ -66,9 +66,9 @@ def save_to_db(df: pd.DataFrame, engine: Engine, dtype_dict: Dict) -> None:
         conn.execute(text("CREATE SCHEMA IF NOT EXISTS gold"))
         
     # Enregistrer les données dans la table gold.dim_date en utilisant des chunks pour gérer les grandes quantités de données
-    chunk_size = 500
-    rows = 0
-    start_time = time.time()
+    chunk_size:int = 500
+    rows:int = 0
+    start_time: float = time.time()
     for start in tqdm(range(0, len(df), chunk_size)):
         end = start + chunk_size
         df.iloc[start:end].to_sql(
@@ -81,7 +81,7 @@ def save_to_db(df: pd.DataFrame, engine: Engine, dtype_dict: Dict) -> None:
             dtype=dtype_dict
         )
         rows += len(df.iloc[start:end])
-    elapsed_time = time.time() - start_time
+    elapsed_time: float = time.time() - start_time
     
     print(f"Toutes les données ont été écrites en {elapsed_time:.2f} secondes. {rows} lignes insérées.")
     
