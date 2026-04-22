@@ -4,7 +4,7 @@ import os
 from tqdm import tqdm
 from sqlalchemy import create_engine, text, Engine
 from sqlalchemy.types import Integer, String, SmallInteger
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict
 
 def get_engine() -> Engine:
     """Créer et retourner une instance Engine pour se connecter à la base PostgreSQL."""
