@@ -19,7 +19,7 @@ services:
     depends_on:
       - postgres-db
     env_file: # Utilisation d'un fichier d'environnement pour les variables sensibles
-      - ingest.env
+      - etl.env
     volumes:
       - ./datasets:/datasets:ro # Monte le répertoire local datasets en lecture seule (ro : read only)
     networks:

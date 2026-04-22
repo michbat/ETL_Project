@@ -149,7 +149,7 @@ def save_to_db(df: pd.DataFrame, engine: Engine, dtype_dict: Dict) -> None:
         )
         rows += len(df.iloc[start:end])
     elapsed_time: float = time.time() - start_time
-    print(f"Toutes les données ont été écrites en {elapsed_time:.2f} secondes. {rows} lignes insérées.")
+    print(f"Toutes les données ont été écrites en {elapsed_time:.2f} secondes. {rows} lignes ont été insérées dans la table 'silver.shootings_clean'")
     
     # Ajouter une clé primaire à la table silver.shootings_clean sur la colonne id_shooting
     with engine.begin() as conn:

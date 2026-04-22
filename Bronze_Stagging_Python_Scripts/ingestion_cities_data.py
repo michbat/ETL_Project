@@ -93,7 +93,7 @@ def main(pg_user: str, pg_pass: str, pg_host: str, pg_port: int, pg_db: str, sch
         if first:
             # Création de la structure de la table lors de la première itération avec remplacement de la table si elle existe déjà (option `if_exists="replace"`)
             df_chunk.head(0).to_sql(name=table_only, schema=schema, con=engine, if_exists="replace", index=False)  # type: ignore
-            first = False # on désactive le drapeau après la première itération pour les suivantes
+            first = False # on désactive le drapeau après la première itération.
             
         # Après la 1ère itération, on ajoute les données avec `if_exists="append"` pour ne pas écraser la table déjà créée
         df_chunk.to_sql(name=table_only, schema=schema, con=engine, if_exists="append", index=False)

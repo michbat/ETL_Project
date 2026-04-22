@@ -97,7 +97,7 @@ def save_to_db(df: pd.DataFrame, engine: Engine, dtype_dict: Dict) -> None:
     
     elapsed_time: float = time.time() - start_time
     
-    print(f"Toutes les données ont été écrites en {elapsed_time:.2f} secondes. {rows} lignes insérées.")
+    print(f"Toutes les données ont été écrites en {elapsed_time:.2f} secondes. {rows} lignes ont été insérées dans la table 'gold.dim_victim'")
     
     # Ajouter la contrainte de clé primaire sur victim_key après l'insertion des données
     with engine.begin() as conn:

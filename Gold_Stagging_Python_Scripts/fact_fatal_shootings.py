@@ -142,7 +142,7 @@ def insert_fact_table(
         )
         rows += len(df_fact.iloc[start:end])
     elapsed_time: float = time.time() - start_time
-    print(f"Toutes les données ont été écrites en {elapsed_time:.2f} secondes. {rows} lignes insérées.")
+    print(f"Toutes les données ont été écrites en {elapsed_time:.2f} secondes. {rows} lignes ont été insérées dans la table 'gold.fact_fatal_shootings'")
 
 def add_primary_key(engine: Engine) -> None:
     """Ajouter la contrainte de clé primaire sur fact_fatal_shootings après insertion."""
