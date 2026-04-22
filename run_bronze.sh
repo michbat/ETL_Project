@@ -21,6 +21,7 @@ PG_ARGS=(--pg-host "${POSTGRES_HOST}" --pg-port "${POSTGRES_PORT}" --pg-user "${
 
 echo "Début de l'ingestion avec host=${POSTGRES_HOST} port=${POSTGRES_PORT} db=${POSTGRES_DB}"
 
+# Exécuter les scripts d'ingestion en passant les arguments de connexion
 python ingestion_cities_data.py "${PG_ARGS[@]}"
 python ingestion_ethnicity_data.py "${PG_ARGS[@]}"
 python ingestion_shootings_data.py "${PG_ARGS[@]}"

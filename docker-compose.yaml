@@ -13,8 +13,8 @@ services:
       - pgdata:/var/lib/postgresql # Chemin vers le volume pgdata dans lequel vont être persisté nos données
     networks:
       - pg-network
-  ingest:  # Service d'ingestion (extraction et chargement dans la couche Bronze)
-    image: ingest:v001
+  bronze:  # Service d'ingestion (extraction et chargement dans la couche Bronze)
+    image: bronze
     restart: "no"
     depends_on:
       - postgres-db
@@ -24,22 +24,22 @@ services:
       - ./datasets:/datasets:ro # Monte le répertoire local datasets en lecture seule (ro : read only)
     networks:
       - pg-network
-  transform:  # Service de création de la couche Silver (transformation)
-    image: transform:v001
+  silver:  # Service de création de la couche Silver (transformation)
+    image: silver
     restart: "no"
     depends_on:
       - postgres-db
     env_file: # Utilisation d'un fichier d'environnement pour les variables sensibles (sécurité)
-      - ingest.env
+      - etl.env
     networks:
       - pg-network
   gold:  # Service de création de la couche Gold (tables dimensionnelles et tables de faits)
-    image: gold:v001
+    image: gold
     restart: "no"
     depends_on:
       - postgres-db
     env_file: # Utilisation d'un fichier d'environnement pour les variables sensibles (sécurité)
-      - ingest.env  
+      - etl.env
     networks:
       - pg-network
       
